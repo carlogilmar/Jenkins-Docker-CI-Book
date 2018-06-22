@@ -4,7 +4,7 @@
 
 # Integración Continua con Jenkins y Docker
 
-1. Diseño de CI
+1. Diseño de CI [Registro de RedHat](chapter1.md)
 2. Registro RedHat
 3. Configuración de Ambiente
 4. Instalación y Post Instalación de Docker
