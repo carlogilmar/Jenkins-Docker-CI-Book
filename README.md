@@ -2,6 +2,10 @@
 
 ## ESCUELA BANCARIA Y COMERCIAL
 
+![](/assets/ci1.jpg)
+
+![](/assets/ci2.jpg)
+
 ### Integración Continua con Jenkins y Docker
 
 1. [Diseño de CI](diseno-de-ci.md)
