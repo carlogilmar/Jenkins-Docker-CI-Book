@@ -2,8 +2,8 @@
 
 1. Despligue de aplicaciones en GlassFish
 2. Detalle de los archivos necesarios
-   1. DockerFile para la imagen 
-   2. Script de despligue 
+   1. DockerFile para la imagen
+   2. Script de despligue
 
 ### Despliegue de aplicaciones en GlassFish
 
@@ -27,7 +27,7 @@ La forma automatizada de realizar esto es creando lo siguiente en el home del us
 
 El siguiente Dockerfile se construirá sobre una imagen preexistente, configurando los parámetros necesarios para desplegar la aplicación.
 
-**Dockerfile**
+**Dockerfile para Glassfish 5**
 
 ```
 FROM oracle/glassfish:5.0
@@ -43,6 +43,76 @@ COPY $PATH_FOLDER/*.war $GLASSFISH_HOME/glassfish/domains/domain1/autodeploy/
 RUN mkdir /root/.project_config
 
 ARG FILE_NAME_CONF
+COPY $PATH_FOLDER/*.properties /root/.project_config/
+
+RUN mkdir /root/files
+
+COPY $PATH_FOLDER/domain.xml $GLASSFISH_HOME/glassfish/domains/domain1/config
+```
+
+**Dockerfile para Glassfish 4**
+
+```
+FROM oracle/glassfish:4.1.2
+
+RUN yum remove java-1.7.0-openjdk-devel -y
+
+RUN yum -y install unzip java-1.8.0-openjdk-1.8.0.151-5.b12.el7_4 && \
+    curl -O $GLASSFISH_URL && \
+    echo "$MD5 *$GLASSFISH_PKG" | md5sum -c - && \
+    unzip -o $GLASSFISH_PKG && \
+    rm -f $GLASSFISH_PKG && \
+    yum -y remove unzip && \
+    rm -rf /var/cache/yum
+
+RUN yum install java-1.8.0-openjdk-devel -y
+
+ENV GLASSFISH_LIB=$GLASSFISH_HOME/glassfish/domains/domain1/lib/ext/
+
+COPY ojdbc8.jar $GLASSFISH_LIB
+
+ARG PATH_FOLDER
+
+COPY $PATH_FOLDER/*.war $GLASSFISH_HOME/glassfish/domains/domain1/autodeploy/
+
+RUN mkdir /root/.project_config
+
+ARG FILE_NAME_CONF
+COPY $PATH_FOLDER/*.properties /root/.project_config/
+
+RUN mkdir /root/files
+
+COPY $PATH_FOLDER/domain.xml $GLASSFISH_HOME/glassfish/domains/domain1/config
+```
+
+**Dockerfile para Grails**
+
+```
+FROM oracle/glassfish:4.1.2
+
+RUN yum remove java-1.7.0-openjdk-devel -y
+
+RUN yum -y install unzip java-1.8.0-openjdk-1.8.0.151-5.b12.el7_4 && \
+    curl -O $GLASSFISH_URL && \
+    echo "$MD5 *$GLASSFISH_PKG" | md5sum -c - && \
+    unzip -o $GLASSFISH_PKG && \
+    rm -f $GLASSFISH_PKG && \
+    yum -y remove unzip && \
+    rm -rf /var/cache/yum
+
+ENV GLASSFISH_LIB=$GLASSFISH_HOME/glassfish/domains/domain1/lib/ext/
+
+COPY ojdbc8.jar $GLASSFISH_LIB
+
+ARG PATH_FOLDER
+
+COPY $PATH_FOLDER/*.war $GLASSFISH_HOME/glassfish/domains/domain1/autodeploy/
+
+RUN mkdir /root/.grails
+RUN mkdir /root/.project_config
+
+ARG FILE_NAME_CONF
+COPY $PATH_FOLDER/*.groovy /root/.grails/
 COPY $PATH_FOLDER/*.properties /root/.project_config/
 
 RUN mkdir /root/files
