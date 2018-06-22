@@ -21,9 +21,9 @@ La forma automatizada de realizar esto es creando lo siguiente en el home del us
 
 ![](/assets/gf2.png)
 
-# Detalle de los archivos 
+# Detalle de los archivos
 
-### **Dockerfile** para la imagen de Glassfish 
+### **Dockerfile** para la imagen de Glassfish
 
 El siguiente Dockerfile se construirá sobre una imagen preexistente, configurando los parámetros necesarios para desplegar la aplicación.
 
@@ -37,21 +37,28 @@ ENV GLASSFISH_LIB=$GLASSFISH_HOME/glassfish/domains/domain1/lib/ext/
 COPY ojdbc8.jar $GLASSFISH_LIB
 
 ARG PATH_FOLDER
+RUN echo $PATH_FOLDER
 COPY $PATH_FOLDER/*.war $GLASSFISH_HOME/glassfish/domains/domain1/autodeploy/
 
 RUN mkdir /root/.project_config
 
 ARG FILE_NAME_CONF
-COPY $PATH_FOLDER/$FILE_NAME_CONF /root/.project_config
+COPY $PATH_FOLDER/*.properties /root/.project_config/
 
 RUN mkdir /root/files
 
 COPY $PATH_FOLDER/domain.xml $GLASSFISH_HOME/glassfish/domains/domain1/config
 ```
 
-## Script de despligue
+## Scripts de despligue
 
-El siguiente script tiene por finalidad construir la imagen de Docker con un servidor GlassFish junto con la configuración necesaria para desplegar la aplicación
+Los siguiente script tiene por finalidad construir la imagen de Docker con un servidor GlassFish junto con la configuración necesaria para desplegar la aplicación.
+
+* Script para generar el contenedor con Glassfish 5
+* Script para generar el contenedor con Glassfish 4
+* Script para generar el contenedor para aplicación Grails
+
+#### Script para generar el contenedor con Glassfish 5
 
 **deployApp.sh**
 
@@ -70,6 +77,52 @@ docker stop $PROJECT_NAME
 docker rm $PROJECT_NAME
 
 docker run --name $PROJECT_NAME -v $VOLUME_NAME -d -p 4848:4848 -p 8080:8080  ebc/glassfish/$PROJECT_NAME
+```
+
+### Script para generar el contenedor con Glassfish 4
+
+deployAppGlassfish4.sh
+
+```
+#!/bin/sh
+
+PATH_FOLDER=$1
+PROJECT_NAME=$2
+VOLUME_APP=$3
+VOLUME_LOG=$4
+PORT=$5
+PORTADMIN=$6
+
+docker build --build-arg PATH_FOLDER=$PATH_FOLDER --file=dockerFiles/DockerfileGlassfish4 . -t ebc/glassfish/$PROJECT_NAME
+
+docker stop $PROJECT_NAME
+
+docker rm $PROJECT_NAME
+
+docker run -dit --restart unless-stopped --name $PROJECT_NAME -v $VOLUME_APP -v $VOLUME_LOG -d -p $PORTADMIN:4848 -p $PORT:8080  ebc/glassfish/$PROJECT_NAME
+```
+
+### Script para generar el contenedor para aplicación Grails
+
+deployAppGrails.sh
+
+```
+#!/bin/sh
+
+PATH_FOLDER=$1
+PROJECT_NAME=$2
+VOLUME_APP=$3
+VOLUME_LOG=$4
+PORT=$5
+PORTADMIN=$6
+
+docker build --build-arg PATH_FOLDER=$PATH_FOLDER --file=dockerFiles/DockerfileGrails . -t ebc/glassfish/$PROJECT_NAME
+
+docker stop $PROJECT_NAME
+
+docker rm $PROJECT_NAME
+
+docker run -dit --restart unless-stopped --name $PROJECT_NAME -v $VOLUME_APP -v $VOLUME_LOG -d -p $PORTADMIN:4848 -p $PORT:8080  ebc/glassfish/$PROJECT_NAME
 ```
 
 

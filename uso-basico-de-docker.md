@@ -7,6 +7,8 @@
 5. Descargar una imagen de Docker Hub
 6. Iniciar un contendor a partir de una imagen de Docker Hub
 7. Comandos básicos
+8. Políticas de Reinicio
+9. Entrar a la bash del contenedor
 
 ### Ejemplo de Dockerfile
 
@@ -25,7 +27,7 @@ También puedes consultar images preexistentes en [Docker Hub](https://hub.docke
 ### Construir una Imagen de Docker
 
 ```
-docker build dockerfile 
+docker build dockerfile
 ```
 
 ### Iniciar un contendor de Docker a partir de una imagen
@@ -91,6 +93,24 @@ docker rm docker-container-id
 ```
 docker logs docker-container-id
 ```
+
+## Políticas de Reinicio de contenedores
+
+Docker puede implementar políticas de reinicio.
+
+```
+docker run -dit --restart unless-stopped ...
+```
+
+La opción  **-dit --restart unless-stopped **reiniciará el contenedor cuando este haya sido irrumpido por fallos, o por reinicio en el server.
+
+### Entrar a la bash del contenedor
+
+```
+docker exec -i -t container-name /bin/bash
+```
+
+
 
 
 

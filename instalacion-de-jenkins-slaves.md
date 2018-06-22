@@ -2,8 +2,12 @@
 
 1. Creación de Slaves en el Jenkins Master
 2. Creación del Jenkins Slave 
-   1. Creación de la imagen de Docker
-   2. Creación del contenedor del Jenkins Slave![](/assets/ebc8.png)
+3. Creación de la imagen de Docker
+4. Creación del contenedor del Jenkins Slave
+5. Instalación de Maven
+6. Políticas de Reinicio de contenedores
+
+![](/assets/ebc6.png)
 
 ## Creación de Slaves en el Jenkins Master
 
@@ -90,5 +94,46 @@ _Sugerencia:_
 
 ### **Para la creación de más Jenkins Slaves no es necesario volver a generar la imagen de Docker, sólo será necesario crear más contenedores con diferentes nombres. **
 
+### Instalación de Maven en Jenkins Slaves
 
+En ocasiones puede ser requerida la instalación de** maven \(.m2\)** en los Jenkins Slave para poder ejecutar las pruebas y construcciones.
+
+1.- Copiar la carpeta comprimida de **.m2 **en el Jenkins Slave
+
+```
+docker cp repository.zip slave-4:/home/jenkins/
+```
+
+2.- Entrar a la shell del Jenkins Slave y descomprimir la carpeta **.m2**
+
+```
+docker exec -i -t slave-4 /bin/bash
+
+mkdir .m2
+
+unzip repository.zip
+
+mv repository .m2/
+```
+
+## Políticas de Reinicio de contenedores
+
+Docker puede implementar políticas de reinicio.
+
+```
+docker run -dit --restart unless-stopped ...
+```
+
+La opción  **-dit --restart unless-stopped **reiniciará el contenedor cuando este haya sido irrumpido por fallos, o por reinicio en el server.
+
+Ejemplo:
+
+```
+docker run -dit --restart unless-stopped -d 
+--name slave-1 ebc/jenkins/jnlp-slave -url http://172.31.100.23:8080  
+-workDir=/home/jenkins/agent 
+1bcf169330dbcc01bcfd55953dad7646e67c0fabf106302667b310dc90c6d357 slave-1
+```
+
+Con el comando anterior inciamos un contenedor de Jenkins Slave con políticas de reinicio. 
 

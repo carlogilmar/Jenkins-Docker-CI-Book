@@ -6,7 +6,7 @@
 
 ### Agregar proyecto individual
 
-Para este caso será necesario agregar un archivo llamado Jenkinsfile y versionarlo. Para este tipo de proyectos solo se agregan los pasos necesarios para ejecutar las pruebas, y en caso de los branch master y QA publicar los resultados. 
+Para este caso será necesario agregar un archivo llamado Jenkinsfile y versionarlo. Para este tipo de proyectos solo se agregan los pasos necesarios para ejecutar las pruebas, y en caso de los branch master y QA publicar los resultados.
 
 Además el proyecto deberá contener los archivos de properties de los ambientes TEST, DEVEL y QA.![](/assets/ebc20.png)
 
@@ -22,13 +22,13 @@ pipeline{
   }
 
   stages {
-		stage('Preparing File Configuration') {
-			steps{
-				echo "Create folder project_config and move file conf"
-					sh 'mkdir -p $HOME/.project_config/'
-					sh 'cp api-seguridad-DEVL.properties $HOME/.project_config/api-seguridad.properties'
-			}
-		}
+        stage('Preparing File Configuration') {
+            steps{
+                echo "Create folder project_config and move file conf"
+                    sh 'mkdir -p $HOME/.project_config/'
+                    sh 'cp api-seguridad-DEVL.properties $HOME/.project_config/api-seguridad.properties'
+            }
+        }
 
     stage('Test App'){
       steps {
@@ -52,23 +52,29 @@ pipeline{
   }
 
   post {
-		success{
-			slackSend color: "good", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was successful"
-		}
-		failure{
-			slackSend color: "danger", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was failed"
-		}
+        success{
+            slackSend color: "good", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was successful"
+        }
+        failure{
+            slackSend color: "danger", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was failed"
+        }
     always {
-			cleanWs()
+            cleanWs()
     }
   }
 
 }
 ```
 
+##### Publicación de pruebas
+
+Para publicar las pruebas es necesario entrar al server de desarrollo, y dentro del directorio** folder\_nginx **crear un directorio con la siguiente estructura:
+
+![](/assets/nginx2.png)
+
 ### Agregar proyecto suite
 
-El proyecto suite es un repositorio de git con las referencias a los submódulos. Será necesario agregar un archivo llamado Jenkinsfile y versionarlo. 
+El proyecto suite es un repositorio de git con las referencias a los submódulos. Será necesario agregar un archivo llamado Jenkinsfile y versionarlo.
 
 ![](/assets/ebc21.png)
 
@@ -79,7 +85,7 @@ Este archivo Jenkinsfile deberá:
 * Dependiendo del branch deberá desplegar en algún ambiente \(master o QA\)
   * Tener en cuenta que la ejecución del script de despliegue debe contener el nombre del proyecto y una asignación de puertos no ocupados 
 
-Ejemplo: 
+Ejemplo:
 
 ```
 pipeline{
@@ -92,8 +98,8 @@ pipeline{
 
   stages {
 
-		stage('Checkout Submodules') {
-			steps{
+        stage('Checkout Submodules') {
+            steps{
         echo "Checkout and init submodules"
         checkout scm: [
                 $class: 'GitSCM',
@@ -108,8 +114,8 @@ pipeline{
                 submoduleCfg: [],
                 userRemoteConfigs: scm.userRemoteConfigs
         ]
-			}
-		}
+            }
+        }
 
     stage('Test submodules: Copy test properties and test'){
       parallel{
@@ -175,7 +181,7 @@ pipeline{
      *  DEVL Environment
      */
 
-		stage('DEVL ENVIRONMENT: Transfering Wars'){
+        stage('DEVL ENVIRONMENT: Transfering Wars'){
       when {
         expression {
           env.BRANCH_NAME in ["master"]
@@ -186,26 +192,26 @@ pipeline{
         stage('Transfering api-ebc-adea war'){
           steps{
             dir('api-ebc-adea'){
-							sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-ebc-adea.war DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/"
+                            sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-ebc-adea.war DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/"
             }
           }
         }
         stage('Transfering api-seguridad war'){
           steps{
             dir('api-seguridad'){
-							sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-seguridad.war DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/"
+                            sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-seguridad.war DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/"
             }
           }
         }
         stage('Transfering expedientes-digitales war'){
           steps{
             dir('expedientes-digitales'){
-							sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no expedientes-digitales.war DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/"
+                            sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no expedientes-digitales.war DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/"
             }
           }
        }
-			}
-		}
+            }
+        }
 
     stage('DEVL ENVIRONMENT: Preparing DEVL Configuration'){
       when {
@@ -215,13 +221,13 @@ pipeline{
       }
       steps{
         dir('api-ebc-adea'){
-					sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-ebc-adea-DEVL.properties DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/api-ebc-adea.properties"
+                    sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-ebc-adea-DEVL.properties DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/api-ebc-adea.properties"
         }
         dir('api-seguridad'){
-					sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-seguridad-DEVL.properties DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/api-seguridad.properties"
+                    sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-seguridad-DEVL.properties DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/api-seguridad.properties"
         }
         dir('expedientes-digitales'){
-					sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no expedientes-digitales-DEVL.properties DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/expedientes-digitales.properties"
+                    sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no expedientes-digitales-DEVL.properties DAWS03LX@172.31.100.25:~/deploys/suite-expediente-digital/expedientes-digitales.properties"
         }
       }
     }
@@ -241,7 +247,7 @@ pipeline{
      *  QA Environment
      */
 
-		stage('QA ENVIRONMENT: Transfering Wars'){
+        stage('QA ENVIRONMENT: Transfering Wars'){
       when {
         expression {
           env.BRANCH_NAME in ["QA"]
@@ -252,26 +258,26 @@ pipeline{
         stage('Transfering api-ebc-adea war'){
           steps{
             dir('api-ebc-adea'){
-							sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-ebc-adea.war TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/"
+                            sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-ebc-adea.war TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/"
             }
           }
         }
         stage('Transfering api-seguridad war'){
           steps{
             dir('api-seguridad'){
-							sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-seguridad.war TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/"
+                            sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-seguridad.war TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/"
             }
           }
         }
         stage('Transfering expedientes-digitales war'){
           steps{
             dir('expedientes-digitales'){
-							sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no expedientes-digitales.war TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/"
+                            sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no expedientes-digitales.war TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/"
             }
           }
        }
-			}
-		}
+            }
+        }
 
     stage('QA ENVIRONMENT: Preparing QA Configuration'){
       when {
@@ -281,13 +287,13 @@ pipeline{
       }
       steps{
         dir('api-ebc-adea'){
-					sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-ebc-adea-QA.properties TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/api-ebc-adea.properties"
+                    sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-ebc-adea-QA.properties TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/api-ebc-adea.properties"
         }
         dir('api-seguridad'){
-					sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-seguridad-QA.properties TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/api-seguridad.properties"
+                    sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no api-seguridad-QA.properties TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/api-seguridad.properties"
         }
         dir('expedientes-digitales'){
-					sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no expedientes-digitales-QA.properties TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/expedientes-digitales.properties"
+                    sh "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no expedientes-digitales-QA.properties TAWS02LX@172.31.100.24:~/deploys/suite-expediente-digital/expedientes-digitales.properties"
         }
       }
     }
@@ -334,7 +340,11 @@ pipeline{
 }
 ```
 
-### Despliegue de un proyecto individual
+**Importante:**
+
+Para el despligue del aplicativo en el ambiente será necesario crear un directorio en **deploys/ **que contenga el **domain.xml **correspondiente. El pipeline se encargará de dejar los archivos .war y .properties en este directorio, y de crear el contenedor a partir del contenido de este directorio. 
+
+# Despliegue de un proyecto individual
 
 En ocasiones será necesario desplegar un solo proyecto, para ello agregaremos el Jenkinsfile bajo el control de versiones y seguiremos los mismos pasos para desplegar un proyecto SUITE.
 
@@ -378,7 +388,7 @@ pipeline{
       }
     }
 
-	/*
+    /*
      *  DEVL Environment
      */
 
@@ -429,7 +439,6 @@ pipeline{
   }
 
 }
-
 ```
 
 
