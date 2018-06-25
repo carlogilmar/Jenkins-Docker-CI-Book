@@ -1,7 +1,7 @@
 # Instalación de Jenkins Slave
 
 1. Creación de Slaves en el Jenkins Master
-2. Creación del Jenkins Slave 
+2. Creación del Jenkins Slave
 3. Creación de la imagen de Docker
 4. Creación del contenedor del Jenkins Slave
 5. Instalación de Maven
@@ -129,11 +129,16 @@ La opción  **-dit --restart unless-stopped **reiniciará el contenedor cuando e
 Ejemplo:
 
 ```
-docker run -dit --restart unless-stopped -d 
---name slave-1 ebc/jenkins/jnlp-slave -url http://172.31.100.23:8080  
--workDir=/home/jenkins/agent 
+docker run -dit --restart unless-stopped -d
+--name slave-1 ebc/jenkins/jnlp-slave -url http://172.31.100.23:8080
+-workDir=/home/jenkins/agent
 1bcf169330dbcc01bcfd55953dad7646e67c0fabf106302667b310dc90c6d357 slave-1
 ```
 
-Con el comando anterior inciamos un contenedor de Jenkins Slave con políticas de reinicio. 
+Con el comando anterior inciamos un contenedor de Jenkins Slave con políticas de reinicio.
+
+---
+
+# IMPORTANTE: Para el correcto funcionamiento de los slaves es necesario entrar al Docker Container y clonar cualquier repositorio de BitBucket Desarrollo EBC.
+
 

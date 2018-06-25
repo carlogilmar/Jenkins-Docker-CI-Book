@@ -32,7 +32,7 @@ Instalación de plugin Jenkins CI en el slack e identificar el **baseURL** y el 
 
 ![](/assets/s2.png)
 
-### Jenkins CI 
+### Jenkins CI
 
 Instalar el plugin **Slack Notification Plugin** en el Jenkins CI![](/assets/s3.png)En la configuración global aparecerá un apartado para configurar las notificaciones por Slack dónde deberán incluir el **BaseURL**, el **team subdomain** \(url del slack\) y el** integration token**.
 
@@ -54,5 +54,11 @@ Una vez instalado lo anterior se podrán enviar notificaciones a través del Jen
 }
 ```
 
+#### Webhooks
 
+Para habilitar un webhook es necesario entrar a la opción de Settings / Webhooks / Add Webhook dentro del repositorio en Bit Bucket del proyecto.
 
+Al añadir el nuevo webhook bastará con sólo agregar un nombre y una URL.
+
+- Title: New Jenkins
+- URL: http://34.225.189.39:8080/bitbucket-scmsource-hook/notify/
