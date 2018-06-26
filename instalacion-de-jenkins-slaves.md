@@ -141,4 +141,16 @@ Con el comando anterior inciamos un contenedor de Jenkins Slave con políticas d
 
 # IMPORTANTE: Para el correcto funcionamiento de los slaves es necesario entrar al Docker Container y clonar cualquier repositorio de BitBucket Desarrollo EBC.
 
+##### Ver los contenedores activos
+
+```
+docker ps
+```
+
+##### Entrar a la bash del contenedor
+
+```
+docker exec -i -t container-name /bin/bash
+```
+
 
